@@ -2,6 +2,9 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
