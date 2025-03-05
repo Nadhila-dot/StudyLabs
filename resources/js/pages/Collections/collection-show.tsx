@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ExternalLink } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ExternalLink, FileText } from 'lucide-react';
 import { BreadcrumbItem } from '@/types';
 
 export default function CollectionShow() {
@@ -19,6 +20,10 @@ export default function CollectionShow() {
         href: `/collections/${collection.id}`,
     },
   ];
+  
+  const openResourcePreview = (url: string) => {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
   
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -51,13 +56,20 @@ export default function CollectionShow() {
           <TabsContent value="resources" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {collection.resources.map(resource => (
-                <Card key={resource.id} className="overflow-hidden">
+                <Card 
+                  key={resource.id} 
+                  className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => openResourcePreview(resource.preview_url)}
+                >
                   <CardHeader>
-                    <CardTitle>{resource.name}</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                      {resource.name}
+                      <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                    </CardTitle>
                     <CardDescription>{resource.subject}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="rounded-md overflow-hidden border h-80">
+                    <div className="rounded-md overflow-hidden border h-80 relative group">
                       <iframe 
                         src={resource.preview_url} 
                         className="w-full h-full"
@@ -65,10 +77,27 @@ export default function CollectionShow() {
                         loading="lazy"
                         allowFullScreen
                       />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                        <Button variant="secondary">
+                          <FileText className="mr-2 h-4 w-4" />
+                          Open Resource
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
-                  <CardFooter>
+                  <CardFooter className="flex justify-between">
                     <Badge>Term: {resource.term}</Badge>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openResourcePreview(resource.preview_url);
+                      }}
+                    >
+                      <ExternalLink className="h-4 w-4 mr-1" />
+                      Open
+                    </Button>
                   </CardFooter>
                 </Card>
               ))}
@@ -88,7 +117,7 @@ export default function CollectionShow() {
                   </CardHeader>
                   <CardContent>
                     <a 
-                      href={book.url} 
+                      href={book.downloadUrl} 
                       target="_blank"
                       rel="noopener noreferrer" 
                       className="inline-flex items-center text-blue-600 hover:underline"

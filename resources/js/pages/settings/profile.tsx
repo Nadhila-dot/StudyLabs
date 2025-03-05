@@ -21,6 +21,16 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+interface InputProps{
+    id: string;
+    className: string;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    required: boolean;
+    autoComplete: string;
+    placeholder: string;
+}
+
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
     const { auth } = usePage<SharedData>().props;
 
