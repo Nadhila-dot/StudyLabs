@@ -50,19 +50,19 @@ class User extends Authenticatable
      * @return array<string, string>
      */
     protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'level' => 'integer',
-            'prizes' => 'array',
-            'rank' => 'array',
-            'is_admin' => 'boolean',
-            'last_seen' => 'datetime',
-            'streak' => 'array',
-            'description' => 'string', // Changed from 'array' to 'string'
-            'is_team' => 'boolean',
-            'ban' => 'boolean',
-        ];
-    }
+{
+    return [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'level' => 'integer',
+        'prizes' => 'array',
+        'rank' => 'array',
+        'is_admin' => 'boolean',
+        'last_seen' => 'datetime',
+        'streak' => 'array',
+        'description' => 'string',
+        'is_team' => 'boolean',
+        'ban' => 'boolean',
+    ];
+}
 }

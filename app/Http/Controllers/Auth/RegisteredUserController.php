@@ -36,7 +36,7 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
-            'description' => 'nullable|string|max:500',
+            'description' => 'nullable|string|max:50000',
         ]);
 
         // Process avatar into base64 if present
@@ -58,16 +58,16 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'level' => 0,
-            'prizes' => [], // Plain array instead of json_encode
-            'rank' => ['Niponvanjith'], // Plain array instead of json_encode
+            'prizes' => [],
+            'rank' => ['Niponvanjith'],
             'is_admin' => false,
             'last_seen' => now(),
-            'streak' => [], // Plain array instead of json_encode
-            'description' => $request->description, // Now storing as a string directly
+            'streak' => [],
+            'description' => $request->description ?? '',
             'is_team' => false,
-            'banner' => $bannerBase64, // Store as base64 string
+            'banner' => $bannerBase64,
             'ban' => false,
-            'avatar' => $avatarBase64, // Store as base64 string
+            'avatar' => $avatarBase64,
         ]);
 
         event(new Registered($user));
