@@ -9,7 +9,7 @@ use Inertia\Inertia;
 use App\Http\Middleware\HandleInertiaRequests;
 use Inertia\Middleware;
 
-class AdminOnly extends HandleInertiaRequests
+class AdminOnly extends Middleware
 {
     protected $rootView = 'app';
 
