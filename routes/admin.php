@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\FileController;
 use App\Http\Controllers\Admin\ResourceController;
 use App\Http\Controllers\Admin;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 // All routes here have the 'admin' prefix and middleware
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
