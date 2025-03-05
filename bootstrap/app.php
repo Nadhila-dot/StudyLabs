@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\admin\AdminOnly;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -22,7 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         
         // Register your admin middleware if needed
         $middleware->alias([
-            'admin' => \App\Http\Middleware\admin\AdminOnly::class,
+            'admin' => AdminOnly::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
