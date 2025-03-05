@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Http\Middleware\HandleInertiaRequests;
+use Inertia\Middleware;
 
 class AdminOnly extends HandleInertiaRequests
 {
