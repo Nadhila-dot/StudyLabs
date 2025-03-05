@@ -26,7 +26,7 @@ createInertiaApp({
 
         root.render(
             <IslandProvider>
-
+                
                 
                 
                 <App {...props} />
@@ -34,7 +34,7 @@ createInertiaApp({
         );
     },
     progress: {
-        color: '#4B5563',
+        color: '#EF4444', // Changed to Tailwind's red-500 color
     },
 });
 
