@@ -6,20 +6,18 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Symfony\Component\HttpFoundation\Response;
+use App\Http\Middleware\HandleInertiaRequests;
 
-class AdminOnly
+class AdminOnly extends HandleInertiaRequests
 {
-    public function handle(Request $request, Closure $next): Response
+    protected $rootView = 'app';
+
+    public function handle(Request $request, Closure $next): mixed
     {
         if (!Auth::check() || !Auth::user()->is_admin) {
-            return response(
-                Inertia::render('Errors/404')->toResponse($request)->getContent(),
-                404,
-                ['Content-Type' => 'text/html']
-            );
+            return Inertia::render('Errors/404');
         }
 
-        return $next($request);
+        return parent::handle($request, $next);
     }
 }
