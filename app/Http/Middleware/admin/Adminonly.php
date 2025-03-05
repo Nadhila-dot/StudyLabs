@@ -1,25 +1,17 @@
 <?php
 
-namespace App\Http\Middleware\Admin;
+namespace App\Http\Controllers\Admin;
 
-use Closure;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Symfony\Component\HttpFoundation\Response;
 
-class AdminOnly
+class AdminController extends Controller
 {
-    public function handle(Request $request, Closure $next): Response
+    public function __construct()
     {
         if (!Auth::check() || !Auth::user()->is_admin) {
-            return response(
-                Inertia::render('Errors/404')->toResponse($request)->getContent(),
-                404,
-                ['Content-Type' => 'text/html']
-            );
+            abort(404);
         }
-
-        return $next($request);
     }
 }

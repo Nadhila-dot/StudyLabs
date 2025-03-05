@@ -37,3 +37,8 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::post('files', [FileController::class, 'store'])->name('files.store');
     Route::delete('files/{filename}', [FileController::class, 'destroy'])->name('files.destroy');
 });
+
+// Fallback route for 404 errors
+Route::fallback(function () {
+    return Inertia::render('Errors/404');
+});
