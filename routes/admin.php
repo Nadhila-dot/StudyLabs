@@ -30,6 +30,9 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
 
     Route::resource('books', Admin\BookController::class);
 
+    Route::resource('collections', Admin\CollectionController::class);
+    
+
     Route::get('users', [Admin\UsersController::class, 'index'])->name('users.index');
     Route::put('users/{user}', [Admin\UsersController::class, 'update'])->name('users.update');
     Route::delete('users/{user}', [Admin\UsersController::class, 'destroy'])->name('users.destroy');

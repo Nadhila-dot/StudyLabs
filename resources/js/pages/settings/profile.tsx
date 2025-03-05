@@ -8,6 +8,7 @@ import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
@@ -26,6 +27,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
         name: auth.user.name,
         email: auth.user.email,
+        description: auth.user.description || '',
     });
 
     const submit: FormEventHandler = (e) => {
@@ -34,19 +36,27 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
         patch(route('profile.update'), {
             preserveScroll: true,
         });
+        submitDescription(e);
+    };
+
+    // In the submitDescription function:
+    const submitDescription = (e: React.FormEvent) => {
+        e.preventDefault();
+        patch(route('profile.description.update'), {
+        
+        });
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Profile settings" />
 
-
             <SettingsLayout>
                 <div className="space-y-6">
-                    <div className=' py-7'>
+                    <div className='py-7'>
                         <ProfileHeader/>
                     </div>
-                    <HeadingSmall title="Profile information" description="Update your name and email address" />
+                    <HeadingSmall title="Profile information" description="Update your personal information" />
 
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid gap-2">
@@ -80,6 +90,21 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                             />
 
                             <InputError className="mt-2" message={errors.email} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="description">About you</Label>
+
+                            <Textarea
+                                id="description"
+                                className="mt-1 block w-full"
+                                value={data.description}
+                                onChange={(e) => setData('description', e.target.value)}
+                                placeholder="Tell others a bit about yourself"
+                                rows={4}
+                            />
+
+                            <InputError className="mt-2" message={errors.description} />
                         </div>
 
                         {mustVerifyEmail && auth.user.email_verified_at === null && (

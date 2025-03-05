@@ -12,6 +12,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // New profile image and description routes
+    Route::post('settings/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
+    Route::post('settings/profile/banner', [ProfileController::class, 'updateBanner'])->name('profile.banner.update');
+    Route::patch('settings/profile/description', [ProfileController::class, 'updateDescription'])->name('profile.description.update');
+
     Route::get('settings/password', [PasswordController::class, 'edit'])->name('password.edit');
     Route::put('settings/password', [PasswordController::class, 'update'])->name('password.update');
 

@@ -7,6 +7,7 @@ import { useIsland } from '@/hooks/useIsland';
 import { MessageCircle } from 'lucide-react'; // Import MessageCircle icon
 import BooksContainer from '@/components/Books/BooksContainer';
 import { DashboardCard } from '@/components/dashboard/dashboard-card';
+import { Undercontruction } from '@/components/elements/UnderContruction';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -28,7 +29,7 @@ export default function Courses() {
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <DashboardCard/>
-                <BooksContainer/>
+                <Undercontruction/>
             </div>
           
         </AppLayout>

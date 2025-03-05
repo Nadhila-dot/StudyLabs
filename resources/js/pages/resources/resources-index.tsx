@@ -12,7 +12,7 @@ import ResourcesList from '@/components/elements/Resources';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'resources',
+        title: 'Resources',
         href: '/resources',
     },
 ];

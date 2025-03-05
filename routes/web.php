@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Dashboard\MainController;
+use App\Http\Controllers\Dashboard;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\FileController;
 use Inertia\Inertia;
@@ -9,7 +10,7 @@ Route::get('/', [MainController::class, 'welcome'])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [MainController::class, 'dashboard'])->name('dashboard');
-    Route::get('courses', [MainController::class, 'dashboard'])->name('main.courses.index');
+    Route::get('courses', [MainController::class, 'courses'])->name('main.courses.index');
 
     Route::get('/files/{filename}', [FileController::class, 'show'])->name('files.show');
     // Add this route to your admin routes
@@ -18,6 +19,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('books', [MainController::class, 'books'])->name('main.books');
 
     Route::get('support', [MainController::class, 'support'])->name('main.books');
+
+    Route::get('/collections', [Dashboard\CollectionController::class, 'index'])->name('collections.index');
+    Route::get('/collections/{collection}', [Dashboard\CollectionController::class, 'show'])->name('collections.show');
 
     
     Route::get('books/redirect/{name}/{url}', [MainController::class, 'redirect'])

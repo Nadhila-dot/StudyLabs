@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Book;
 use Illuminate\Support\Facades\Http;
 use App\Models\Resource; //
+use App\Models\Collection;
+
 
 use Inertia\Inertia;
 
@@ -43,8 +45,17 @@ class MainController extends Controller
      */
     public function dashboard()
     {
-        return Inertia::render('dashboard');
+        $collections = Collection::with(['user', 'books', 'resources'])->get();
+        $resources = Resource::all();
+        $books = Book::all();
+        
+        return Inertia::render('dashboard', [
+            'collections' => $collections,
+            'resources' => $resources,
+            'books' => $books
+        ]);
     }
+
     /**
      * Display Courses for User - > [Take which specificiation]
      */
