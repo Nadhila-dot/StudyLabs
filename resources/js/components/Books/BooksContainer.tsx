@@ -30,7 +30,7 @@ interface BooksContainerProps {
 const BooksContainer: React.FC<BooksContainerProps> = ({
   title = "Educational Books",
   description = "Browse our collection of educational books",
-  emptyMessage = "No books found.. Try to contact support at nadhilaplayz@gmail.com",
+  emptyMessage = "No books found.. Try to contact support at studylabs@nadhi.dev@gmail.com",
   className = ""
 }) => {
   const { books, categories, filters } = usePage().props as {

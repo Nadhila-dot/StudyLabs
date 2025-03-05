@@ -17,6 +17,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('books', [MainController::class, 'books'])->name('main.books');
 
+    Route::get('support', [MainController::class, 'support'])->name('main.books');
+
     
     Route::get('books/redirect/{name}/{url}', [MainController::class, 'redirect'])
         ->name('main.books.redirect')

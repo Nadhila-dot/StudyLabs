@@ -54,6 +54,15 @@ class MainController extends Controller
         return Inertia::render('courses/courses-index');
     }
 
+    /**
+     * Display Support for User - > [Take which specificiation]
+     */
+
+     public function support()
+     {
+         return Inertia::render('Support/support-index');
+     }
+
     
     /**
      * Display a listing of the books. (It queries the DB to the get all of it)

@@ -18,6 +18,6 @@ class AdminOnly extends Inertia
             return Inertia::render('Errors/404');
         }
 
-        return parent::handle($request, $next);
+        return $next($request);
     }
 }
