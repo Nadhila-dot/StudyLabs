@@ -31,7 +31,9 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::resource('books', Admin\BookController::class);
 
     Route::resource('collections', Admin\CollectionController::class);
-    
+
+    Route::resource('posts', Admin\PostController::class);
+
 
     Route::get('users', [Admin\UsersController::class, 'index'])->name('users.index');
     Route::put('users/{user}', [Admin\UsersController::class, 'update'])->name('users.update');

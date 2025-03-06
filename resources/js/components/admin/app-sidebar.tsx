@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, LucideBook, LucideFiles, LucideHouse, LucideLayout, LucideNotebook, LucideUsers, LucideWalletCards, Settings2 } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, LucideBook, LucideFiles, LucideHouse, LucideLayout, LucideMessageCircle, LucideNotebook, LucideUsers, LucideWalletCards, Settings2 } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -37,6 +37,11 @@ const mainNavItems: NavItem[] = [
         title: 'Collections',
         url: '/admin/collections',
         icon: LucideWalletCards,
+    },
+    {
+        title: 'Posts',
+        url: '/admin/posts',
+        icon: LucideMessageCircle,
     },
     
 ];

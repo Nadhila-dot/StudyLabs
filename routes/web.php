@@ -5,12 +5,16 @@ use App\Http\Controllers\Dashboard;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\FileController;
 use Inertia\Inertia;
+use App\Http\Controllers\Dashboard\NewsController as DashboardNewsController;
 
 Route::get('/', [MainController::class, 'welcome'])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [MainController::class, 'dashboard'])->name('dashboard');
     Route::get('courses', [MainController::class, 'courses'])->name('main.courses.index');
+
+    Route::get('/news', [DashboardNewsController::class, 'index'])->name('dashboard.news.index');
+    Route::get('/news/{slug}', [DashboardNewsController::class, 'show'])->name('news.show');
 
     Route::get('/files/{filename}', [FileController::class, 'show'])->name('files.show');
     // Add this route to your admin routes
