@@ -92,7 +92,7 @@ class MainController extends Controller
                         // Log that we're using a similar match
                         \Log::info("User '{$decodedName}' not found exactly, using closest match: '{$user->name}'");
                     } else {
-                        return Inertia::render('Errors/404', [
+                        return Inertia::render('Errors/Notfounduser', [
                             'message' => 'User not found',
                             'type' => 'user',
                             'suggestions' => User::limit(5)->get(['id', 'name']), // Suggest some users to explore
