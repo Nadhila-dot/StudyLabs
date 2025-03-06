@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+
 use Inertia\Inertia;
 
 class PostController extends Controller
@@ -39,40 +40,42 @@ class PostController extends Controller
     /**
      * Store a newly created post in storage.
      */
+    /**
+     * Store a newly created post in storage.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'excerpt' => 'nullable|string|max:500',
-            'featured_image' => 'nullable|string', // Changed from 'image' to 'string' to accept base64
+            'featured_image' => 'nullable|string', // Changed to string to accept base64
             'published' => 'boolean',
         ]);
 
-        $post = new Post();
-        $post->title = $validated['title'];
-        
-        // Generate a unique slug
         $baseSlug = Str::slug($validated['title']);
         $slug = $baseSlug;
         $counter = 1;
         
-        // Check if the slug exists and append a number until it's unique
+        // Keep checking and incrementing until we find a unique slug
         while (Post::where('slug', $slug)->exists()) {
             $slug = $baseSlug . '-' . $counter;
             $counter++;
         }
         
-        $post->slug = $slug;
+        $post = new Post();
+        $post->title = $validated['title'];
+        $post->slug = $slug; // Use our unique slug
         $post->content = $validated['content'];
         $post->excerpt = $validated['excerpt'] ?? Str::limit(strip_tags($validated['content']), 150);
         $post->published = $validated['published'] ?? false;
         
+        // Set published_at if published for the first time
         if ($validated['published'] && !$post->published_at) {
             $post->published_at = now();
         }
 
-        // Handle the featured image as a string (can be a base64 encoded image)
+        // Handle the featured image if provided
         if (!empty($validated['featured_image'])) {
             $post->featured_image = $validated['featured_image'];
         }
