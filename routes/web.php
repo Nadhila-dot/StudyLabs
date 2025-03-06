@@ -16,7 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/news', [DashboardNewsController::class, 'index'])->name('dashboard.news.index');
     Route::get('/news/{slug}', [DashboardNewsController::class, 'show'])->name('news.show');
 
-    Route::get('view', [MainController::class, 'users'])->name('users.show.user');
+    Route::get('view', [DashboardNewsController::class, 'index'])->name('dashboard.news.index.test');
 
     Route::get('/files/{filename}', [FileController::class, 'show'])->name('files.show');
     // Add this route to your admin routes
