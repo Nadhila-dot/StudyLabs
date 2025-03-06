@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Book;
+use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use App\Models\Resource; //
 use App\Models\Collection;
@@ -55,6 +56,86 @@ class MainController extends Controller
             'books' => $books
         ]);
     }
+
+
+public function users($name)
+{
+    try {
+        // URL decode the name parameter
+        $decodedName = urldecode($name);
+        
+        // Find the user by name
+        $user = User::where('name', $decodedName)->first();
+        
+        // If user not found, return 404
+        if (!$user) {
+            return Inertia::render('Errors/404', [
+                'message' => 'User not found',
+                'type' => 'user',
+            ])->status(404);
+        }
+        
+        // Get collections directly from the Collection model by user_id
+        $collections = Collection::where('user_id', $user->id)
+            ->orderByDesc('created_at')
+            ->limit(5)
+            ->with('resources') // Eager load resources to avoid N+1
+            ->get()
+            ->map(function($collection) {
+                return [
+                    'id' => $collection->id,
+                    'name' => $collection->name,
+                    'description' => $collection->description,
+                    'subject' => $collection->subject,
+                    'section' => $collection->section,
+                    'created_at' => $collection->created_at->format('M d, Y'),
+                    'resource_count' => $collection->resources->count(),
+                ];
+            });
+            
+        // Define the data we want to send to the frontend
+        $userData = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'avatar' => $user->avatar ?? null,
+            'banner' => $user->banner ?? null,
+            'level' => $user->level ?? 1,
+            'description' => $user->description ?? '',
+            'is_admin' => $user->is_admin ?? false, // Add admin status
+            'is_team' => $user->is_team ?? false,   // Add team status
+            'member_since' => $user->created_at->format('F Y'),
+            'collections' => $collections,          // Add properly formatted collections
+        ];
+        
+        // Check if user has posts relationship and add if exists
+        if (method_exists($user, 'posts')) {
+            $userData['posts'] = $user->posts()
+                ->where('published', true)
+                ->orderByDesc('created_at')
+                ->limit(3)
+                ->get()
+                ->map(function($post) {
+                    return [
+                        'id' => $post->id,
+                        'title' => $post->title,
+                        'slug' => $post->slug,
+                        'excerpt' => $post->excerpt ?? substr(strip_tags($post->content), 0, 100) . '...',
+                        'published_at' => $post->published_at->format('M d, Y'),
+                    ];
+                });
+        }
+        
+        return Inertia::render('Users/users-index', [
+            'user' => $userData,
+        ]);
+    } catch (\Exception $e) {
+        \Log::error('Error in users profile: ' . $e->getMessage());
+        return Inertia::render('Errors/404', [
+            'message' => 'User not found',
+            'type' => 'user',
+        ])->status(404);
+    }
+}
 
     /**
      * Display Courses for User - > [Take which specificiation]

@@ -21,6 +21,8 @@ class DashboardController extends Controller
             'stats' => $stats
         ]);
     }
+
+    
     
     public function settings(): Response
     {
