@@ -15,7 +15,7 @@ class AdminOnly extends Inertia
     public function handle(Request $request, Closure $next): mixed
     {
         if (!Auth::check() || !Auth::user()->is_admin) {
-            return Inertia::render('Errors/40jj4');
+            return Inertia::render('Errors/404');
         }
 
         return $next($request);
