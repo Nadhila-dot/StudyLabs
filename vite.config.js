@@ -2,6 +2,7 @@ import react from '@vitejs/plugin-react-swc';
 import laravel from 'laravel-vite-plugin';
 import million from 'million/compiler';
 import { defineConfig } from 'vite';
+import tailwindcss from "@tailwindcss/vite";
 import { resolve } from 'path';
 
 export default defineConfig({
@@ -10,6 +11,7 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.tsx'],
             refresh: true,
         }),
+        tailwindcss(),
         million.vite({
             auto: {
                 threshold: 0.05, // Only adds Million.js to components that would benefit
