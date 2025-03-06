@@ -36,7 +36,8 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
 
 
     Route::get('users', [Admin\UsersController::class, 'index'])->name('users.index');
-    Route::put('users/{user}', [Admin\UsersController::class, 'update'])->name('users.update');
+    Route::put('users/{user}', [Admin\UsersController::class, 'update'])->name('users.update.new
+    ');
     Route::delete('users/{user}', [Admin\UsersController::class, 'destroy'])->name('users.destroy');
 
     Route::get('files', [FileController::class, 'index'])->name('files.index');

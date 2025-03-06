@@ -104,7 +104,7 @@ export default function Usersview({ users, filters }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    put(route('admin.users.update', userToEdit.id), {
+    put(route('admin.users.update.new', userToEdit.id), {
       onSuccess: () => {
         setIsEditDialogOpen(false);
         toast({
@@ -165,7 +165,7 @@ export default function Usersview({ users, filters }) {
         break;
     }
 
-    router.put(route('admin.users.update', user.id), userData)
+    router.put(route('admin.users.update.new', user.id), userData)
       .then(() => {
         let message = '';
         switch(action) {
