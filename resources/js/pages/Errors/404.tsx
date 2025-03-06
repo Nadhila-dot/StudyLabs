@@ -19,6 +19,9 @@ export default function NotFound() {
   // Get the current URL from Inertia page props
   const { url } = usePage().props as any;
   const { showMessage } = useIsland();
+
+  const props = usePage();
+  console.log('The props are', props);
   
   useEffect(() => {
     if (showMessage) {
