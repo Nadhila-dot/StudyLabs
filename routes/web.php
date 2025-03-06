@@ -43,5 +43,5 @@ require __DIR__.'/admin.php';
 
 // Fallback route for 404 errors
 Route::fallback(function () {
-    return Inertia::render('Errors/404');
+    return Inertia::render('Errors/404jj');
 });
