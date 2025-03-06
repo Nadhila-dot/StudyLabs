@@ -130,7 +130,7 @@ public function users($name)
         ]);
     } catch (\Exception $e) {
         \Log::error('Error in users profile: ' . $e->getMessage());
-        return Inertia::render('Errors/404', [
+        return Inertia::render('Errors/Notfound', [
             'message' => 'User not found',
             'type' => 'user',
         ])->status(404);
