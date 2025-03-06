@@ -22,7 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('books', [MainController::class, 'books'])->name('main.books');
 
-    Route::get('support', [MainController::class, 'support'])->name('main.books');
+    Route::get('support', [MainController::class, 'support'])->name('main.support');
 
     Route::get('/collections', [Dashboard\CollectionController::class, 'index'])->name('collections.index');
     Route::get('/collections/{collection}', [Dashboard\CollectionController::class, 'show'])->name('collections.show');
