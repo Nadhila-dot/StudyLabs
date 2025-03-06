@@ -151,13 +151,13 @@ class MainController extends Controller
                     });
             }
             
-            return Inertia::render('Users/Show', [
+            return Inertia::render('Users/users-index', [
                 'user' => $userData,
                 'exactMatch' => $user->name === $decodedName, // Send whether this is an exact match
             ]);
         } catch (\Exception $e) {
             \Log::error('Error in users profile: ' . $e->getMessage());
-            return Inertia::render('Errors/404', [
+            return Inertia::render('Errors/Notfound', [
                 'message' => 'User not found',
                 'type' => 'user',
             ])->status(404);
