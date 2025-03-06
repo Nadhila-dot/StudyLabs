@@ -14,7 +14,7 @@ export default defineConfig({
         tailwindcss(),
         million.vite({
             auto: {
-                threshold: 0.1, // Only adds Million.js to components that would benefit
+                threshold: 0.01, // Only adds Million.js to components that would benefit
             },
             telemetry: false, // Disable telemetry
         }),

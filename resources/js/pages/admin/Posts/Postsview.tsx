@@ -119,12 +119,40 @@ export default function PostsView({ posts }) {
   
   const handleEditSubmit = (e) => {
     e.preventDefault();
-    updatePost(route('admin.posts.update', currentPost.id), {
-      onSuccess: () => {
-        setEditDialogOpen(false);
-        resetEdit();
-      }
-    });
+    
+    // Need to convert the image file to base64 string if it exists
+    if (editData.featured_image instanceof File) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Create a new object with all the edit data plus the base64 image
+        const dataToSubmit = {
+          ...editData,
+          featured_image: reader.result
+        };
+        
+        // Send the request with the complete data
+        updatePost(route('admin.posts.update', currentPost.id), {
+          data: dataToSubmit, // Explicitly pass the data
+          onSuccess: () => {
+            setEditDialogOpen(false);
+            resetEdit();
+            setEditImagePreview(null);
+          }
+        });
+      };
+      reader.readAsDataURL(editData.featured_image);
+    } else {
+      // If no new image was selected, just send the current data
+      // including the existing image URL if there was one
+      updatePost(route('admin.posts.update', currentPost.id), {
+        data: editData, // Explicitly pass the data
+        onSuccess: () => {
+          setEditDialogOpen(false);
+          resetEdit();
+          setEditImagePreview(null);
+        }
+      });
+    }
   };
   
   const handleEditImageChange = (e) => {
