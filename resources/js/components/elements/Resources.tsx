@@ -3,6 +3,7 @@ import { useState } from "react"
 import {
   Pagination,
   PaginationContent,
+  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -57,6 +58,63 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources = [] }) => {
     setCurrentPage(1) // Reset to first page when search changes
   }
   
+  // Handle page navigation
+  const handlePageChange = (page: number, e: React.MouseEvent) => {
+    e.preventDefault()
+    setCurrentPage(page)
+  }
+  
+  // Handle previous/next navigation
+  const handlePrevious = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setCurrentPage(prev => Math.max(prev - 1, 1))
+  }
+  
+  const handleNext = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setCurrentPage(prev => Math.min(prev + 1, totalPages))
+  }
+  
+  // Determine which page links to show (with ellipsis for many pages)
+  const getPageLinks = () => {
+    const pageItems = []
+    
+    if (totalPages <= 5) {
+      // Show all pages if 5 or fewer
+      for (let i = 1; i <= totalPages; i++) {
+        pageItems.push(i)
+      }
+    } else {
+      // Always show first page
+      pageItems.push(1)
+      
+      // Show ellipsis or nearby pages
+      if (currentPage > 3) {
+        pageItems.push('ellipsis1')
+      }
+      
+      // Show pages around current page
+      const startPage = Math.max(2, currentPage - 1)
+      const endPage = Math.min(totalPages - 1, currentPage + 1)
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pageItems.push(i)
+      }
+      
+      // Show ellipsis before last page if needed
+      if (currentPage < totalPages - 2) {
+        pageItems.push('ellipsis2')
+      }
+      
+      // Always show last page
+      if (totalPages > 1) {
+        pageItems.push(totalPages)
+      }
+    }
+    
+    return pageItems
+  }
+  
   return (
     <div className="space-y-6">
       {/* Search bar */}
@@ -106,27 +164,35 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources = [] }) => {
               <PaginationContent>
                 <PaginationItem>
                   <PaginationPrevious 
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    href="#"
+                    onClick={handlePrevious}
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                   />
                 </PaginationItem>
                 
-                {Array.from({length: totalPages}, (_, i) => i + 1).map(page => (
-                  <PaginationItem key={page}>
-                    <PaginationLink 
-                      isActive={page === currentPage}
-                      onClick={() => setCurrentPage(page)}
-                      className="cursor-pointer"
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
+                {getPageLinks().map((page, i) => (
+                  page === 'ellipsis1' || page === 'ellipsis2' ? (
+                    <PaginationItem key={`ellipsis-${i}`}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  ) : (
+                    <PaginationItem key={`page-${page}`}>
+                      <PaginationLink 
+                        href="#"
+                        onClick={(e) => handlePageChange(page as number, e)}
+                        isActive={page === currentPage}
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )
                 ))}
                 
                 <PaginationItem>
                   <PaginationNext 
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    href="#"
+                    onClick={handleNext}
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
                   />
                 </PaginationItem>
               </PaginationContent>
