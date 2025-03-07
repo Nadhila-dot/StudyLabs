@@ -1,6 +1,5 @@
 import { ExternalLink, Search } from "lucide-react"
 import { useState } from "react"
-import { Link } from "@inertiajs/react"
 import {
   Pagination,
   PaginationContent,
@@ -20,32 +19,17 @@ export interface Resource {
   category: string
 }
 
-interface PaginationLink {
-  url: string | null
-  label: string
-  active: boolean
-}
-
-interface PaginatedResources {
-  current_page: number
-  data: Resource[]
-  last_page: number
-  per_page: number
-  total: number
-  links: PaginationLink[]
-  next_page_url: string | null
-  prev_page_url: string | null
-  path: string
-}
-
 interface ResourcesListProps {
-  resources?: PaginatedResources
+  resources?: Resource[]  // Now accepts a simple array
 }
 
-const ResourcesList: React.FC<ResourcesListProps> = ({ resources }) => {
+const ITEMS_PER_PAGE = 6
+
+const ResourcesList: React.FC<ResourcesListProps> = ({ resources = [] }) => {
   const [searchQuery, setSearchQuery] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
   
-  if (!resources || !resources.data || resources.data.length === 0) {
+  if (!resources || resources.length === 0) {
     return (
       <div className="p-4 text-center">
         <p className="text-muted-foreground">No resources available</p>
@@ -55,20 +39,23 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources }) => {
   
   // Filter resources based on search query
   const filteredResources = searchQuery.trim() === "" 
-    ? resources.data
-    : resources.data.filter(resource => 
+    ? resources
+    : resources.filter(resource => 
         resource.name.toLowerCase().includes(searchQuery.toLowerCase())
       )
+  
+  // Calculate total pages
+  const totalPages = Math.ceil(filteredResources.length / ITEMS_PER_PAGE)
+  
+  // Get current page of resources
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  const paginatedResources = filteredResources.slice(startIndex, startIndex + ITEMS_PER_PAGE)
   
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
+    setCurrentPage(1) // Reset to first page when search changes
   }
-  
-  // Get pagination links excluding prev/next controls (usually first and last elements)
-  const pageLinks = resources.links.filter((link, i) => 
-    i !== 0 && i !== resources.links.length - 1 && link.url !== null
-  )
   
   return (
     <div className="space-y-6">
@@ -91,7 +78,7 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources }) => {
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredResources.map((resource) => (
+            {paginatedResources.map((resource) => (
               <div key={resource.id} className="border rounded shadow p-4">
                 <h3 className="text-lg font-bold">{resource.name}</h3>
                 <iframe
@@ -114,33 +101,33 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources }) => {
             ))}
           </div>
           
-          {resources.last_page > 1 && (
+          {totalPages > 1 && (
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
-                  <Link href={resources.prev_page_url || '#'} preserveState>
-                    <PaginationPrevious 
-                      className={!resources.prev_page_url ? "pointer-events-none opacity-50" : ""}
-                    />
-                  </Link>
+                  <PaginationPrevious 
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
                 </PaginationItem>
                 
-                {pageLinks.map((link, i) => (
-                  <PaginationItem key={i}>
-                    <Link href={link.url || '#'} preserveState>
-                      <PaginationLink isActive={link.active}>
-                        {link.label}
-                      </PaginationLink>
-                    </Link>
+                {Array.from({length: totalPages}, (_, i) => i + 1).map(page => (
+                  <PaginationItem key={page}>
+                    <PaginationLink 
+                      isActive={page === currentPage}
+                      onClick={() => setCurrentPage(page)}
+                      className="cursor-pointer"
+                    >
+                      {page}
+                    </PaginationLink>
                   </PaginationItem>
                 ))}
                 
                 <PaginationItem>
-                  <Link href={resources.next_page_url || '#'} preserveState>
-                    <PaginationNext 
-                      className={!resources.next_page_url ? "pointer-events-none opacity-50" : ""}
-                    />
-                  </Link>
+                  <PaginationNext 
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
                 </PaginationItem>
               </PaginationContent>
             </Pagination>

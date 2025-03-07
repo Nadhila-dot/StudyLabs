@@ -31,15 +31,15 @@ class MainController extends Controller
      
 
      public function resources()
-     {
-         $resources = Resource::query()
-             ->latest()
-             ->paginate(10);
-     
-         return Inertia::render('resources/resources-index', [
-             'resources' => $resources
-         ]);
-     }
+{
+    $resources = Resource::query()
+        ->latest()
+        ->get();
+    
+    return Inertia::render('resources/resources-index', [
+        'resources' => $resources
+    ]);
+}
 
     /**
      * Display the dashboard.
