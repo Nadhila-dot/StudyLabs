@@ -1,11 +1,55 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { usePage } from "@inertiajs/react"
 import { motion } from "framer-motion"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { CalendarClock, Clock, Quote } from "lucide-react"
+
+const AdBanner = () => {
+  const adContainerRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    // Create first script element that sets the configuration options
+    const script1 = document.createElement('script');
+    script1.type = 'text/javascript';
+    script1.text = `
+      atOptions = {
+        'key' : '7a6f3fb740ba622b905d1002527963ba',
+        'format' : 'iframe',
+        'height' : 60,
+        'width' : 468,
+        'params' : {}
+      };
+    `;
+    
+    // Create second script element that loads the ad
+    const script2 = document.createElement('script');
+    script2.type = 'text/javascript';
+    script2.src = '//www.highperformanceformat.com/7a6f3fb740ba622b905d1002527963ba/invoke.js';
+    
+    // Add scripts to DOM
+    if (adContainerRef.current) {
+      adContainerRef.current.appendChild(script1);
+      adContainerRef.current.appendChild(script2);
+    }
+    
+    // Cleanup when component unmounts
+    return () => {
+      if (adContainerRef.current) {
+        if (script1.parentNode === adContainerRef.current) {
+          adContainerRef.current.removeChild(script1);
+        }
+        if (script2.parentNode === adContainerRef.current) {
+          adContainerRef.current.removeChild(script2);
+        }
+      }
+    };
+  }, []);
+  
+  return <div ref={adContainerRef} className="mt-0 flex justify-center"></div>;
+};
 
 export const DashboardCard = () => {
   const props = usePage().props as any
@@ -55,6 +99,7 @@ export const DashboardCard = () => {
   }
 
   return (
+    <>
     <Card className="w-full mb-6 overflow-hidden rounded-lg border-0 bg-[url('https://picsum.photos/1920/1080')]">
       <CardContent className="p-0">
         <motion.div
@@ -156,6 +201,8 @@ export const DashboardCard = () => {
         </motion.div>
       </CardContent>
     </Card>
+    <AdBanner/>
+    </>
   )
 }
 
