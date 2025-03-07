@@ -58,95 +58,111 @@ class MainController extends Controller
     }
 
 
-    public function users(Request $request)
-{
-    try {
-        // Get name from query parameter
-        $name = $request->query('name');
-        
-        // If no name provided, show generic users page
-        if (!$name) {
-            // Show all users or redirect to a different page
+    public function users($name)
+    {
+        try {
+            // URL decode the name parameter
+            $decodedName = urldecode($name);
+            
+            // Try to find the user by exact name match
+            $user = User::where('name', $decodedName)->first();
+            
+            // If exact match not found, try fuzzy matching
+            if (!$user) {
+                // Try case-insensitive search
+                $user = User::whereRaw('LOWER(name) = ?', [strtolower($decodedName)])->first();
+                
+                // If still not found, try partial match
+                if (!$user) {
+                    // Get similar users based on name similarity
+                    $similarUsers = User::whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($decodedName) . '%'])
+                        ->orWhereRaw('LOWER(name) LIKE ?', ['%' . strtolower(str_replace(' ', '%', $decodedName)) . '%'])
+                        ->limit(5)
+                        ->get();
+                    
+                    if ($similarUsers->isNotEmpty()) {
+                        // Sort by name similarity (closest match first)
+                        $sortedUsers = $similarUsers->sortBy(function ($user) use ($decodedName) {
+                            return levenshtein(strtolower($user->name), strtolower($decodedName));
+                        });
+                        
+                        // Take the closest match
+                        $user = $sortedUsers->first();
+                        
+                        // Log that we're using a similar match
+                        \Log::info("User '{$decodedName}' not found exactly, using closest match: '{$user->name}'");
+                    } else {
+                        return Inertia::render('Errors/404', [
+                            'message' => 'User not found',
+                            'type' => 'user',
+                            'suggestions' => User::limit(5)->get(['id', 'name']), // Suggest some users to explore
+                        ])->status(404);
+                    }
+                }
+            }
+            
+            // Get collections directly from the Collection model by user_id
+            $collections = Collection::where('user_id', $user->id)
+                ->orderByDesc('created_at')
+                ->limit(5)
+                ->with('resources') // Eager load resources to avoid N+1
+                ->get()
+                ->map(function($collection) {
+                    return [
+                        'id' => $collection->id,
+                        'name' => $collection->name,
+                        'description' => $collection->description,
+                        'subject' => $collection->subject,
+                        'section' => $collection->section,
+                        'created_at' => $collection->created_at->format('M d, Y'),
+                        'resource_count' => $collection->resources->count(),
+                    ];
+                });
+                
+            // Define the data we want to send to the frontend
+            $userData = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'avatar' => $user->avatar ?? null,
+                'banner' => $user->banner ?? null,
+                'level' => $user->level ?? 1,
+                'description' => $user->description ?? '',
+                'is_admin' => $user->is_admin ?? false,
+                'is_team' => $user->is_team ?? false,
+                'member_since' => $user->created_at->format('F Y'),
+                'collections' => $collections,
+            ];
+            
+            // Check if user has posts relationship and add if exists
+            if (method_exists($user, 'posts')) {
+                $userData['posts'] = $user->posts()
+                    ->where('published', true)
+                    ->orderByDesc('created_at')
+                    ->limit(3)
+                    ->get()
+                    ->map(function($post) {
+                        return [
+                            'id' => $post->id,
+                            'title' => $post->title,
+                            'slug' => $post->slug,
+                            'excerpt' => $post->excerpt ?? substr(strip_tags($post->content), 0, 100) . '...',
+                            'published_at' => $post->published_at->format('M d, Y'),
+                        ];
+                    });
+            }
+            
             return Inertia::render('Users/users-index', [
-                'users' => User::latest()->limit(10)->get(),
+                'user' => $userData,
+                'exactMatch' => $user->name === $decodedName, // Send whether this is an exact match
             ]);
-        }
-        
-        // URL decode the name parameter
-        $decodedName = urldecode($name);
-        
-        // Find the user by name
-        $user = User::where('name', $decodedName)->first();
-        
-        // If user not found, return 404
-        if (!$user) {
+        } catch (\Exception $e) {
+            \Log::error('Error in users profile: ' . $e->getMessage());
             return Inertia::render('Errors/404', [
                 'message' => 'User not found',
                 'type' => 'user',
             ])->status(404);
         }
-        
-        // Get collections directly from the Collection model by user_id
-        $collections = Collection::where('user_id', $user->id)
-            ->orderByDesc('created_at')
-            ->limit(5)
-            ->with('resources') // Eager load resources to avoid N+1
-            ->get()
-            ->map(function($collection) {
-                return [
-                    'id' => $collection->id,
-                    'name' => $collection->name,
-                    'description' => $collection->description,
-                    'subject' => $collection->subject,
-                    'section' => $collection->section,
-                    'created_at' => $collection->created_at->format('M d, Y'),
-                    'resource_count' => $collection->resources->count(),
-                ];
-            });
-            
-        // Define the data we want to send to the frontend
-        $userData = [
-            'id' => $user->id,
-            'name' => $user->name,
-            'avatar' => $user->avatar ?? null,
-            'banner' => $user->banner ?? null,
-            'level' => $user->level ?? 1,
-            'description' => $user->description ?? '',
-            'is_admin' => $user->is_admin ?? false,
-            'is_team' => $user->is_team ?? false,
-            'member_since' => $user->created_at->format('F Y'),
-            'collections' => $collections,
-        ];
-        
-        // Check if user has posts relationship and add if exists
-        if (method_exists($user, 'posts')) {
-            $userData['posts'] = $user->posts()
-                ->where('published', true)
-                ->orderByDesc('created_at')
-                ->limit(3)
-                ->get()
-                ->map(function($post) {
-                    return [
-                        'id' => $post->id,
-                        'title' => $post->title,
-                        'slug' => $post->slug,
-                        'excerpt' => $post->excerpt ?? substr(strip_tags($post->content), 0, 100) . '...',
-                        'published_at' => $post->published_at->format('M d, Y'),
-                    ];
-                });
-        }
-        
-        return Inertia::render('Users/users-index', [
-            'user' => $userData,
-        ]);
-    } catch (\Exception $e) {
-        \Log::error('Error in users profile: ' . $e->getMessage());
-        return Inertia::render('Errors/404', [
-            'message' => 'User not found',
-            'type' => 'user',
-        ])->status(404);
     }
-}
 
     /**
      * Display Courses for User - > [Take which specificiation]
