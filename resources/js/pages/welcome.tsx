@@ -14,6 +14,9 @@ import {
 import { router } from '@inertiajs/react';
 import { LucideGraduationCap } from 'lucide-react';
 import ToggleThemeSwitch from '@/components/elements/ToogleThemeSwitch';
+import { Globe } from '@/components/ui/globe';
+import Footer from '@/components/Footer/footer';
+import { Badge } from '@/components/ui/badge';
 
 export default function Welcome() {
   const { auth } = usePage<SharedData>().props;
@@ -47,6 +50,7 @@ export default function Welcome() {
   };
 
   return (
+    <>
     <>
       <Head title="Welcome">
         <link rel="preconnect" href="https://fonts.bunny.net" />
@@ -128,6 +132,7 @@ export default function Welcome() {
         
         <div className="flex w-full items-center justify-center opacity-100 transition-opacity duration-750 lg:grow starting:opacity-0 z-10">
           <main className="text-center max-w-3xl">
+            
             <div className="flex justify-center items-center mb-8">
                 <LucideGraduationCap className="w-16 h-16 text-primary" />
               
@@ -156,7 +161,11 @@ export default function Welcome() {
                 </Link>
               </div>
             )}
+            <div className='animate-bounce mt-5'>
+              <Badge>We Welcome teachers aswell!</Badge>
+            </div>
           </main>
+          
         </div>
       </div>
       
@@ -191,6 +200,19 @@ export default function Welcome() {
           100% { stroke-dashoffset: -100; }
         }
       `}</style>
+      <div className="fixed top-1/2 opacity-25 right-[-2400px] bottom-5 transform -translate-y-1/99 z-0  pointer-events-none">
+              <div className="w-[5200px] h-[5200px] bg-transparent">
+                <Globe />
+              </div>
+      
+            </div>
+      <div className='z-10 dark:bg-black bg-white'>
+        
+      </div>
+    </>
+    <div className='fixed bottom-0 w-full '>
+      <Footer/>
+    </div>
     </>
   );
 }

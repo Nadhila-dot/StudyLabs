@@ -30,6 +30,7 @@ class User extends Authenticatable
         'description',
         'is_team',
         'banner',
+        'coins',
         'ban',
         'avatar',
     ];
@@ -63,6 +64,7 @@ class User extends Authenticatable
         'description' => 'string',
         'is_team' => 'boolean',
         'ban' => 'boolean',
+        'coins' => 'array',
     ];
 }
 }
