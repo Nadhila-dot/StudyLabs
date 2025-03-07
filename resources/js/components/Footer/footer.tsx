@@ -15,7 +15,7 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="w-full py-6 px-4 bg-white dark:bg-black border-t border-gray-200 dark:border-gray-800 transition-colors duration-200 mt-auto">
+    <footer className="w-full py-6 px-4 bg-white dark:bg-black border-t border-gray-200 dark:border-gray-800 transition-colors duration-200 mt-auto z-10">
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-600 dark:text-gray-300 text-sm">
