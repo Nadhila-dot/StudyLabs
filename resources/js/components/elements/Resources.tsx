@@ -19,17 +19,23 @@ export interface Resource {
   category: string
 }
 
-interface ResourcesListProps {
-  resources?: Resource[]
+interface PaginatedResources {
+  current_page: number
+  data: Resource[]
+  last_page: number
+  per_page: number
+  total: number
+  links?: any[]
 }
 
-const ITEMS_PER_PAGE = 6
+interface ResourcesListProps {
+  resources?: PaginatedResources
+}
 
-const ResourcesList: React.FC<ResourcesListProps> = ({ resources = [] }) => {
-  const [currentPage, setCurrentPage] = useState(1)
+const ResourcesList: React.FC<ResourcesListProps> = ({ resources }) => {
   const [searchQuery, setSearchQuery] = useState("")
   
-  if (!resources || resources.length === 0) {
+  if (!resources || !resources.data || resources.data.length === 0) {
     return (
       <div className="p-4 text-center">
         <p className="text-muted-foreground">No resources available</p>
@@ -39,19 +45,14 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources = [] }) => {
   
   // Filter resources based on search query
   const filteredResources = searchQuery.trim() === "" 
-    ? resources 
-    : resources.filter(resource => 
+    ? resources.data
+    : resources.data.filter(resource => 
         resource.name.toLowerCase().includes(searchQuery.toLowerCase())
       )
-  
-  const totalPages = Math.ceil(filteredResources.length / ITEMS_PER_PAGE)
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
-  const currentResources = filteredResources.slice(startIndex, startIndex + ITEMS_PER_PAGE)
   
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
-    setCurrentPage(1) // Reset to first page when search changes
   }
   
   return (
@@ -75,7 +76,7 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources = [] }) => {
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {currentResources.map((resource) => (
+            {filteredResources.map((resource) => (
               <div key={resource.id} className="border rounded shadow p-4">
                 <h3 className="text-lg font-bold">{resource.name}</h3>
                 <iframe
@@ -98,22 +99,21 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources = [] }) => {
             ))}
           </div>
           
-          {totalPages > 1 && (
+          {resources.last_page > 1 && (
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
                   <PaginationPrevious 
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    href={resources.prev_page_url || '#'}
+                    className={!resources.prev_page_url ? "pointer-events-none opacity-50" : ""}
                   />
                 </PaginationItem>
                 
-                {Array.from({length: totalPages}, (_, i) => i + 1).map(page => (
+                {Array.from({length: resources.last_page}, (_, i) => i + 1).map(page => (
                   <PaginationItem key={page}>
                     <PaginationLink 
-                      isActive={page === currentPage}
-                      onClick={() => setCurrentPage(page)}
-                      className="cursor-pointer"
+                      href={`${resources.path}?page=${page}`}
+                      isActive={page === resources.current_page}
                     >
                       {page}
                     </PaginationLink>
@@ -122,8 +122,8 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources = [] }) => {
                 
                 <PaginationItem>
                   <PaginationNext 
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    href={resources.next_page_url || '#'}
+                    className={!resources.next_page_url ? "pointer-events-none opacity-50" : ""}
                   />
                 </PaginationItem>
               </PaginationContent>
