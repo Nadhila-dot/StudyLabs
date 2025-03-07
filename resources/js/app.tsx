@@ -7,6 +7,8 @@ import { route as routeFn } from 'ziggy-js';
 import { initializeTheme } from './hooks/use-appearance';
 import { IslandProvider } from './components/context/Island';
 import { Island } from './components/dynamic-island/Island';
+import { Suspense } from 'react';
+import { Loader2 } from 'lucide-react';
 
 declare global {
     const route: typeof routeFn;
@@ -14,13 +16,17 @@ declare global {
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
-
-
-
-
-
-
-
+// Loading screen component with Lucide icon
+const LoadingScreen = () => (
+  <div className="flex items-center justify-center w-screen h-screen bg-background">
+    <div className="flex flex-col items-center space-y-4">
+      <Loader2 className="h-12 w-12 text-primary animate-spin" />
+      <p className="text-xl font-extrabold text-foreground/80">
+        Made by Nadhi.dev ❤️
+      </p>
+    </div>
+  </div>
+);
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -30,17 +36,9 @@ createInertiaApp({
 
         root.render(
             <IslandProvider>
-                
-                
-                
-                <App {...props} />
+                <Suspense fallback={<LoadingScreen />}>
+                    <App {...props} />
+                </Suspense>
             </IslandProvider>
         );
     },
-    progress: {
-        color: '#EF4444', // Changed to Tailwind's red-500 color
-    },
-});
-
-// This will set light / dark mode on load...
-initializeTheme();
