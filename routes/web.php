@@ -15,7 +15,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/news', [DashboardNewsController::class, 'index'])->name('dashboard.news.index');
 
-    Route::get('/news/test', [DashboardNewsController::class, 'index'])->name('dashboard.news.index');
+    Route::get('/news/test', [DashboardNewsController::class, 'index'])->name('dashboard.news.index.test');
 
     Route::get('/news/{slug}', [DashboardNewsController::class, 'show'])->name('news.show');
 
