@@ -1,5 +1,6 @@
 import { ExternalLink, Search } from "lucide-react"
 import { useState } from "react"
+import { Link } from "@inertiajs/react"
 import {
   Pagination,
   PaginationContent,
@@ -19,13 +20,22 @@ export interface Resource {
   category: string
 }
 
+interface PaginationLink {
+  url: string | null
+  label: string
+  active: boolean
+}
+
 interface PaginatedResources {
   current_page: number
   data: Resource[]
   last_page: number
   per_page: number
   total: number
-  links?: any[]
+  links: PaginationLink[]
+  next_page_url: string | null
+  prev_page_url: string | null
+  path: string
 }
 
 interface ResourcesListProps {
@@ -54,6 +64,11 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources }) => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
   }
+  
+  // Get pagination links excluding prev/next controls (usually first and last elements)
+  const pageLinks = resources.links.filter((link, i) => 
+    i !== 0 && i !== resources.links.length - 1 && link.url !== null
+  )
   
   return (
     <div className="space-y-6">
@@ -103,28 +118,29 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources }) => {
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
-                  <PaginationPrevious 
-                    href={resources.prev_page_url || '#'}
-                    className={!resources.prev_page_url ? "pointer-events-none opacity-50" : ""}
-                  />
+                  <Link href={resources.prev_page_url || '#'} preserveState>
+                    <PaginationPrevious 
+                      className={!resources.prev_page_url ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </Link>
                 </PaginationItem>
                 
-                {Array.from({length: resources.last_page}, (_, i) => i + 1).map(page => (
-                  <PaginationItem key={page}>
-                    <PaginationLink 
-                      href={`${resources.path}?page=${page}`}
-                      isActive={page === resources.current_page}
-                    >
-                      {page}
-                    </PaginationLink>
+                {pageLinks.map((link, i) => (
+                  <PaginationItem key={i}>
+                    <Link href={link.url || '#'} preserveState>
+                      <PaginationLink isActive={link.active}>
+                        {link.label}
+                      </PaginationLink>
+                    </Link>
                   </PaginationItem>
                 ))}
                 
                 <PaginationItem>
-                  <PaginationNext 
-                    href={resources.next_page_url || '#'}
-                    className={!resources.next_page_url ? "pointer-events-none opacity-50" : ""}
-                  />
+                  <Link href={resources.next_page_url || '#'} preserveState>
+                    <PaginationNext 
+                      className={!resources.next_page_url ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </Link>
                 </PaginationItem>
               </PaginationContent>
             </Pagination>
