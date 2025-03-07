@@ -55,7 +55,7 @@ export const DashboardCard = () => {
   }
 
   return (
-    <Card className="w-full mb-6 overflow-hidden rounded-lg border-0 bg-[url('/background-herp.jpg')]">
+    <Card className="w-full mb-6 overflow-hidden rounded-lg border-0 bg-[url('https://picsum.photos/1920/1080')]">
       <CardContent className="p-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
