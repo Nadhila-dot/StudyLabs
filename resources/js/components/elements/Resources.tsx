@@ -1,14 +1,5 @@
-import { ExternalLink, Search } from "lucide-react"
+import { ExternalLink, Search, ChevronLeft, ChevronRight } from "lucide-react"
 import { useState } from "react"
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
 import { Input } from "@/components/ui/input"
 
 export interface Resource {
@@ -21,7 +12,7 @@ export interface Resource {
 }
 
 interface ResourcesListProps {
-  resources?: Resource[]  // Now accepts a simple array
+  resources?: Resource[]
 }
 
 const ITEMS_PER_PAGE = 6
@@ -59,19 +50,16 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources = [] }) => {
   }
   
   // Handle page navigation
-  const handlePageChange = (page: number, e: React.MouseEvent) => {
-    e.preventDefault()
+  const handlePageChange = (page: number) => {
     setCurrentPage(page)
   }
   
   // Handle previous/next navigation
-  const handlePrevious = (e: React.MouseEvent) => {
-    e.preventDefault()
+  const handlePrevious = () => {
     setCurrentPage(prev => Math.max(prev - 1, 1))
   }
   
-  const handleNext = (e: React.MouseEvent) => {
-    e.preventDefault()
+  const handleNext = () => {
     setCurrentPage(prev => Math.min(prev + 1, totalPages))
   }
   
@@ -159,44 +147,62 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources = [] }) => {
             ))}
           </div>
           
+          {/* Custom Pagination */}
           {totalPages > 1 && (
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious 
-                    href="#"
-                    onClick={handlePrevious}
-                    className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                  />
-                </PaginationItem>
+            <div className="flex justify-center items-center mt-6">
+              <nav className="flex items-center space-x-1">
+                {/* Previous button */}
+                <button
+                  onClick={handlePrevious}
+                  disabled={currentPage === 1}
+                  className={`relative inline-flex items-center rounded-md px-2 py-2 text-sm ${
+                    currentPage === 1
+                      ? "opacity-50 cursor-not-allowed"
+                      : "text-foreground hover:bg-accent cursor-pointer"
+                  }`}
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
                 
-                {getPageLinks().map((page, i) => (
-                  page === 'ellipsis1' || page === 'ellipsis2' ? (
-                    <PaginationItem key={`ellipsis-${i}`}>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                  ) : (
-                    <PaginationItem key={`page-${page}`}>
-                      <PaginationLink 
-                        href="#"
-                        onClick={(e) => handlePageChange(page as number, e)}
-                        isActive={page === currentPage}
-                      >
-                        {page}
-                      </PaginationLink>
-                    </PaginationItem>
-                  )
-                ))}
+                {/* Page numbers */}
+                {getPageLinks().map((item, index) => {
+                  if (item === 'ellipsis1' || item === 'ellipsis2') {
+                    return (
+                      <span key={`ellipsis-${index}`} className="px-3 py-2 text-sm text-foreground">
+                        ...
+                      </span>
+                    );
+                  }
+                  
+                  return (
+                    <button
+                      key={`page-${item}`}
+                      onClick={() => handlePageChange(item as number)}
+                      className={`relative inline-flex items-center px-3 py-2 text-sm rounded-md ${
+                        currentPage === item
+                          ? "bg-primary text-primary-foreground font-medium"
+                          : "text-foreground hover:bg-accent"
+                      }`}
+                    >
+                      {item}
+                    </button>
+                  );
+                })}
                 
-                <PaginationItem>
-                  <PaginationNext 
-                    href="#"
-                    onClick={handleNext}
-                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+                {/* Next button */}
+                <button
+                  onClick={handleNext}
+                  disabled={currentPage === totalPages}
+                  className={`relative inline-flex items-center rounded-md px-2 py-2 text-sm ${
+                    currentPage === totalPages
+                      ? "opacity-50 cursor-not-allowed"
+                      : "text-foreground hover:bg-accent cursor-pointer"
+                  }`}
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </nav>
+            </div>
           )}
         </>
       )}
