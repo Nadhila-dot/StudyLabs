@@ -1,5 +1,5 @@
 import { LucideLink2, ChevronLeft, ChevronRight } from "lucide-react"
-import type React from "react"
+import React, { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Pagination,
@@ -20,28 +20,35 @@ export interface Resource {
   category: string
 }
 
-interface PaginatedResources {
-  data: Resource[]
-  current_page: number
-  last_page: number
-  // Add other pagination fields if needed
-}
-
 interface ResourcesListProps {
-  resources?: PaginatedResources
-  onPageChange?: (page: number) => void
+  resources?: Resource[]
+  itemsPerPage?: number
 }
 
-const ResourcesList: React.FC<ResourcesListProps> = ({ resources, onPageChange }) => {
-  if (!resources || !resources.data) {
+const ResourcesList: React.FC<ResourcesListProps> = ({ 
+  resources = [], 
+  itemsPerPage = 6  // Default to 9 items per page (3x3 grid)
+}) => {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Calculate pagination details
+  const totalItems = resources.length;
+  const lastPage = Math.ceil(totalItems / itemsPerPage);
+  
+  // Get current page's items
+  const currentItems = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+    return resources.slice(startIndex, endIndex);
+  }, [resources, currentPage, itemsPerPage, totalItems]);
+
+  if (!resources || resources.length === 0) {
     return (
       <div className="p-4 text-center">
         <p className="text-muted-foreground">No resources available</p>
       </div>
     )
   }
-
-  const { current_page, last_page } = resources;
   
   // Generate pagination items
   const renderPaginationItems = () => {
@@ -53,7 +60,7 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources, onPageChange }
         <PaginationLink 
           href="#" 
           onClick={(e) => handlePageClick(e, 1)} 
-          isActive={current_page === 1}
+          isActive={currentPage === 1}
         >
           1
         </PaginationLink>
@@ -61,7 +68,7 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources, onPageChange }
     );
 
     // If there are many pages, show ellipsis after first page
-    if (current_page > 3) {
+    if (currentPage > 3) {
       items.push(
         <PaginationItem key="ellipsis-1">
           <PaginationEllipsis />
@@ -70,15 +77,15 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources, onPageChange }
     }
 
     // Show pages around current page
-    for (let i = Math.max(2, current_page - 1); i <= Math.min(last_page - 1, current_page + 1); i++) {
-      if (i === 1 || i === last_page) continue; // Skip first and last as they're always shown
+    for (let i = Math.max(2, currentPage - 1); i <= Math.min(lastPage - 1, currentPage + 1); i++) {
+      if (i === 1 || i === lastPage) continue; // Skip first and last as they're always shown
       
       items.push(
         <PaginationItem key={i}>
           <PaginationLink 
             href="#" 
             onClick={(e) => handlePageClick(e, i)} 
-            isActive={current_page === i}
+            isActive={currentPage === i}
           >
             {i}
           </PaginationLink>
@@ -87,7 +94,7 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources, onPageChange }
     }
 
     // If there are many pages, show ellipsis before last page
-    if (current_page < last_page - 2) {
+    if (currentPage < lastPage - 2 && lastPage > 3) {
       items.push(
         <PaginationItem key="ellipsis-2">
           <PaginationEllipsis />
@@ -96,15 +103,15 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources, onPageChange }
     }
 
     // Always show last page if it's not the first page
-    if (last_page > 1) {
+    if (lastPage > 1) {
       items.push(
         <PaginationItem key="last">
           <PaginationLink 
             href="#" 
-            onClick={(e) => handlePageClick(e, last_page)} 
-            isActive={current_page === last_page}
+            onClick={(e) => handlePageClick(e, lastPage)} 
+            isActive={currentPage === lastPage}
           >
-            {last_page}
+            {lastPage}
           </PaginationLink>
         </PaginationItem>
       );
@@ -118,15 +125,17 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources, onPageChange }
     page: number
   ) => {
     e.preventDefault();
-    if (onPageChange && page !== current_page) {
-      onPageChange(page);
+    if (page !== currentPage) {
+      setCurrentPage(page);
+      // Scroll to top of the list
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
   
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {resources.data.map((resource) => (
+        {currentItems.map((resource) => (
           <div key={resource.id} className="border rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow">
             <h3 className="text-lg font-bold mb-2">{resource.name}</h3>
             <div className="relative aspect-video mb-3 bg-muted rounded overflow-hidden">
@@ -165,15 +174,15 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources, onPageChange }
       </div>
       
       {/* Shadcn Pagination */}
-      {last_page > 1 && (
+      {lastPage > 1 && (
         <Pagination className="mt-8">
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious 
                 href="#" 
-                onClick={(e) => handlePageClick(e, Math.max(1, current_page - 1))}
-                aria-disabled={current_page === 1}
-                className={current_page === 1 ? "pointer-events-none opacity-50" : ""}
+                onClick={(e) => handlePageClick(e, Math.max(1, currentPage - 1))}
+                aria-disabled={currentPage === 1}
+                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
               />
             </PaginationItem>
             
@@ -182,9 +191,9 @@ const ResourcesList: React.FC<ResourcesListProps> = ({ resources, onPageChange }
             <PaginationItem>
               <PaginationNext 
                 href="#" 
-                onClick={(e) => handlePageClick(e, Math.min(last_page, current_page + 1))}
-                aria-disabled={current_page === last_page}
-                className={current_page === last_page ? "pointer-events-none opacity-50" : ""}
+                onClick={(e) => handlePageClick(e, Math.min(lastPage, currentPage + 1))}
+                aria-disabled={currentPage === lastPage}
+                className={currentPage === lastPage ? "pointer-events-none opacity-50" : ""}
               />
             </PaginationItem>
           </PaginationContent>
