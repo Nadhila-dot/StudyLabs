@@ -163,7 +163,7 @@ export const ProfileHeader = () => {
             <Button 
               size="icon" 
               variant="ghost" 
-              className="absolute bottom-0 right-0 rounded-full bg-background shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute bottom-0 right-0 rounded-full bg-background shadow-md transition-opacity"
               onClick={() => setAvatarDialogOpen(true)}
             >
               <Camera className="h-4 w-4" />

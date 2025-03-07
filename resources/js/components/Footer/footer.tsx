@@ -36,7 +36,7 @@ export default function Footer() {
             </Link>*/}
           </div>
           <p className="text-gray-500 dark:text-gray-400 text-xs mt-2 md:mt-0">
-            ©️ Web Technologies and Frontend by Nadhila Alokabandara. Courses and Resources by Savith Ratanaweera & <b><a href='/team'> Other collaborators </a></b>
+            ©️ Web Technologies and Frontend by Nadhila Alokabandara. Courses and Resources by Savith Ratnaweera & <b><a href='/team'> Other collaborators </a></b>
           </p>
         </div>
         <div className="mt-4">
